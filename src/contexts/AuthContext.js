@@ -3,6 +3,8 @@ import { auth } from '../firebase'
 import firebase from "firebase/app";
 import "firebase/database";
 
+//Context per passare informazioni importanti a tutti gli elementi
+//Utilizzato principalmente per passare l'utente correntemente loggato e per login/signup
 
 const AuthContext = React.createContext()
 

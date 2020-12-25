@@ -11,15 +11,15 @@ export default function DesignerContent() {
     const [buttonSign, setButtonSign] = useState('+')
     const { currentUser } = useAuth()
     const [designs, setDesigns] = useState([]);
-    let counter = 0;
+    let counter = 0; //Sempre per l'unique key del map
     const history = useHistory()
 
     useEffect(()=>{
          loadProjects()
     }, [])
 
+    //Stessa funzione di projectComponents/DesignView.js
     function loadProjects(){
-        setDesigns([])
         var projects = firebase.database().ref('/projects');
         projects.on('value', (snapshot)=>{
             let dsgn = []
@@ -39,6 +39,7 @@ export default function DesignerContent() {
         })
     }
 
+    //Funzione per gestire il bottone di aggiunta progetto
     function handleClick(){
         if(adding){
             setAdding(false)
@@ -52,6 +53,7 @@ export default function DesignerContent() {
     function handleProjectClick(props){
         history.push({
             pathname:'/project',
+            //props di ProjectPage.js
             project: {uid: props.uid,
                       pid: props.pid,
                       title: props.title,
@@ -61,8 +63,11 @@ export default function DesignerContent() {
         })
     }
 
+    //Funzione per eliminare un progetto
     function deleteProject(props){
+        //Rimuove dati del progetto dal db
         firebase.database().ref('/projects/'+currentUser.uid+'/'+props.pid).remove()
+        //Rimuove file da storage
         firebase.storage().ref().child('/'+currentUser.uid+'/'+props.name).delete()
     }
 

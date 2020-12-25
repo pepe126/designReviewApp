@@ -4,6 +4,8 @@ import "firebase/database";
 import { useAuth } from '../contexts/AuthContext'
 import { useHistory } from 'react-router-dom'
 
+//Pagina dove viene caricato il progetto
+//props da DesignView.js
 export default function ProjectPage(props) {
     const { currentUser } = useAuth()
     const [author, setAuthor] = useState({})
@@ -11,7 +13,7 @@ export default function ProjectPage(props) {
     const history = useHistory()
     const[comments, setComments] = useState([])
     const[commenter, setCommenter] = useState({})
-    let counter = 0
+    let counter = 0 //per settare key unica per il map dei commenti
 
     useEffect(()=>{
         retrieveAuthor();
@@ -20,20 +22,24 @@ export default function ProjectPage(props) {
     }, [])
 
     function retrieveAuthor(){
+        //Funzione per fetchare nome e cognome dell'autore del progetto
         if(props.location.project){
             var user = firebase.database().ref('/users/'+props.location.project.uid)
             user.once('value', (snapshot) => {
-                setAuthor({name: snapshot.val().name, surname: snapshot.val().surname})
+                setAuthor({name: snapshot.val().name, 
+                           surname: snapshot.val().surname})
             })
         }
     }
 
     function retrieveComments(){
+        //Funzione per fetchare i commenti
         if(props.location.project){
             var comments = firebase.database().ref('/projects/'+props.location.project.uid + '/' + props.location.project.pid+'/comments');
             comments.on('value', (snapshot)=>{
                 let msgs = [];
                 snapshot.forEach((snap)=>{
+                    //pushare i commenti in un array temporaneo e successivamente allo stato
                     msgs.push(snap.val());
                 })
                 setComments(comments => msgs);
@@ -42,26 +48,32 @@ export default function ProjectPage(props) {
     }
 
     function retrieveCommenter(){
+        //Funzione per fetchare e settare nome e cognome del current user per i nuove commenti
         var commentAuthor = firebase.database().ref('/users/'+currentUser.uid).on('value', (snapshot)=>{
-            setCommenter({name: snapshot.val().name, surname: snapshot.val().surname})
+            setCommenter({name: snapshot.val().name, 
+                          surname: snapshot.val().surname})
         })
     }
 
     const handleSubmit = (e) =>{
         e.preventDefault()
+        //pushare commento nel db
         firebase.database().ref('/projects/'+ props.location.project.uid + '/' + props.location.project.pid +'/comments/').push({
             author: commenter.name + ' ' +commenter.surname,
             comment: commentRef.current.value
         })
+        //ripulire input section
         commentRef.current.value = ''
     }
 
+    //Torna alla dashborad
     const handleBack = (e) =>{
         e.preventDefault()
         history.push('/')
     }
 
     if(! props.location.project){
+        //pushar dashboard se l'utenta entra nella pagina del progetto senza selezionarne uno prima
         history.push('/')
         return <div>No project selected</div>
     }else {

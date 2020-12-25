@@ -4,7 +4,7 @@ import 'firebase/storage';
 import "firebase/database";
 import { useAuth } from '../../contexts/AuthContext'
 
-
+//Sezione per aggiungere un progetto
 export default function AddPage() {
     const titleRef = useRef()
     const descriptionRef = useRef()
@@ -14,10 +14,16 @@ export default function AddPage() {
     const [loading, setLoading] = useState(false)
     const [fileName, setFileName] = useState('')
 
+
+    //funzione per caricare i file nello storage di firebase
     const handleFileChange = async (e) =>{
+        //Loading necessario per disabilitare submit button mentre si sta caricano il file
         setLoading(true)
         const file = e.target.files[0]
+        //nello storage ogni user ha una cartella con il proprio user id
         const storageRef = firebase.storage().ref('/'+currentUser.uid)
+        //crea referenza al file stesso con il suo nome (potrebbe creare problemi se
+        //si uplodano due projetti diversi con lo stesso nome dallo stesso user)
         const fileRef = storageRef.child(file.name)
         await fileRef.put(file)
         setFileName(file.name)
@@ -25,14 +31,20 @@ export default function AddPage() {
         setLoading(false)
     }
 
+    //Funzione per submittare il progetto
+    //TODO provare ad unirla con handleFileChange per evitare che l'utente aggiunga
+    //un progetto allo storage senza però concludere il procedimento di aggiunta project
     const handleSubmit = (e) => {
         e.preventDefault();
+        //push crea id unico per ogni progetto nel database per poi poter usare questi
+        //dati in altri componenti
         firebase.database().ref('/projects/' + currentUser.uid ).push({
             title: titleRef.current.value,
             description: descriptionRef.current.value,
             pr: fileUrl,
             name: fileName
         })
+        //Pulizia form
         titleRef.current.value=''
         descriptionRef.current.value=''
         designRef.current.value=null

@@ -7,6 +7,10 @@ import Login from './components/auth/Login'
 import PrivateRoute from './components/PrivateRoute'
 import ProjectPage from './components/ProjectPage';
 
+//Set up routes
+//Dashbord è settata su private per impedire l'accesso a chi non possiede un profilo
+
+
 function App() {
   return (
     <Router>

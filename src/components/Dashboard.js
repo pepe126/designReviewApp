@@ -12,14 +12,16 @@ export default function Dashboard() {
     const { currentUser, logout } = useAuth()
     const history = useHistory()
     const [role, setRole] = useState('')
-    const [roleProp, setRoleProp] = useState('')
     
-    useEffect((users) => {
+    useEffect(() => {
         firebase.database().ref('/users/'+currentUser.uid).on("value", (snapshot) => {
+            //Settare lo stato role per determinare il contenuto della dashboard
             setRole(snapshot.val().role);
         });
     }, [])
+
     
+    //Funzione per loggare out, logout() da contesto
     async function handleLogout(){
         setError('')
         try {
@@ -30,6 +32,8 @@ export default function Dashboard() {
         }
     }
 
+
+    //Load dashboard in base al ruolo dell'utente
     function LoadGraph(){
         if(role === 'customer'){
             return <CustomerContent />
